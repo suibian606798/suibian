@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bdqn.mapper.ColourMapper">
+	<!-- 多对一 -->
+	<resultMap type="colour" id="colour">
+		<id property="c_no" column="c_no" javaType="java.lang.Integer"/>
+        <result property="c_name" column="c_name" javaType="java.lang.String"/>
+    </resultMap>
+    <!-- 查询颜色表 -->
+	<select id="queryColour" resultMap="colour">
+		SELECT * FROM `colour`
+	</select>
+	
+	<!-- 实现添加颜色 -->
+	<insert id="addColour">
+		insert into
+		colour(c_name)
+		values(#{colour.c_name})
+	</insert>
+</mapper>

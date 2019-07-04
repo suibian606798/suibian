@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bdqn.mapper.InventoryMapper">
+	<resultMap type="inventory" id="inventory">
+		<!-- 配置映射 -->
+		<id property="tory_no" column="tory_no"
+			javaType="java.lang.Integer" />
+		<result property="tory_name" column="tory_name"
+			javaType="java.lang.String" />
+		<result property="tory_size" column="tory_size"
+			javaType="java.lang.String" />
+		<result property="tory_price" column="tory_price"
+			javaType="java.lang.Double" />
+		<result property="tory_date" column="tory_date"
+			javaType="java.util.Date" />
+		<result property="tory_count" column="tory_count"
+			javaType="java.lang.Integer" />
+		<result property="tory_remark" column="tory_remark"
+			javaType="java.lang.String" />
+
+		<!-- 配置一对多 -->
+		<collection property="colour" ofType="colour">
+			<id property="c_no" column="c_no" javaType="java.lang.Integer" />
+			<result property="c_name" column="c_name"
+				javaType="java.lang.String" />
+		</collection>
+	</resultMap>
+
+	<!-- 查询库存表 -->
+	<select id="queryInventory" resultMap="inventory">
+		SELECT * FROM `inventory` tory
+		INNER JOIN `colour` c
+		ON
+		tory.`tory_c_no`=c.`c_no`
+		<where>
+			<if test="inventory.tory_name!=null and inventory.tory_name!=''">
+				and tory.tory_name like
+				CONCAT('%',#{inventory.tory_name},'%')
+			</if>
+			<if test="inventory.tory_size!=null and inventory.tory_size!=''">
+				and tory.tory_size like
+				CONCAT('%',#{inventory.tory_size},'%')
+			</if>
+			<if test="inventory.tory_date!=null and inventory.tory_date!=''">
+				and tory.tory_date like
+				CONCAT('%',#{inventory.tory_date},'%')
+			</if>
+		</where>
+		ORDER BY tory.tory_name
+	</select>
+
+	<!-- 添加库存表 -->
+	<insert id="addInventory">
+		insert into
+		inventory(tory_name,tory_c_no,tory_size,tory_price,tory_date,tory_count,tory_remark)
+		values(#{inventory.tory_name},#{inventory.colour.c_no},#{inventory.tory_size},#{inventory.tory_price},#{inventory.tory_date},#{inventory.tory_count},#{inventory.tory_remark})
+	</insert>
+
+	<!-- 实现根据id查询 -->
+	<select id="queryInventoryByid" resultMap="inventory">
+		SELECT * FROM
+		`inventory` tory
+		WHERE tory.`tory_no`=#{inventory.tory_no}
+	</select>
+
+	<!-- 实现修改商品 -->
+	<update id="updateInventoryByid">
+		UPDATE inventory tory set
+		tory.tory_name=#{inventory.tory_name},tory.tory_c_no=#{inventory.colour.c_no},tory.tory_size=#{inventory.tory_size},tory.tory_price=#{inventory.tory_price},tory.tory_date=#{inventory.tory_date},tory.tory_count=#{inventory.tory_count},tory.tory_remark=#{inventory.tory_remark}
+		where tory.tory_no=#{inventory.tory_no}
+	</update>
+	
+	<!-- 实现删除商品 -->
+	<update id="delInventoryByid">
+		DELETE FROM inventory WHERE tory_no=#{inventory.tory_no}
+	</update>
+	
+	<!-- 实现验证商品是否存在 -->
+	<select id="queryInventoryByExists" resultMap="inventory">
+		SELECT * FROM
+		`inventory` tory
+		WHERE tory.tory_name=#{inventory.tory_name} and tory.tory_c_no=#{inventory.colour.c_no} and tory.tory_size=#{inventory.tory_size} and tory.tory_price=#{inventory.tory_price}
+	</select>
+	
+	<!-- 实现修改库存 -->
+	<update id="updateInventoryCountByid">
+		UPDATE inventory tory set
+		tory.tory_count=#{inventory.tory_count}
+		where tory.tory_no=#{inventory.tory_no}
+	</update>
+	
+	<!-- 实现查询当前库存 -->
+	<select id="queryInventoryCountByid" resultType="int">
+		SELECT SUM(tory_count) FROM `inventory` 
+	</select>
+</mapper>
